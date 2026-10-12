@@ -1,5 +1,4 @@
-import { join } from "node:path";
-
+import { userMacHopperApplication } from "../config/hopperLauncher.js";
 import { isOwnedClientRegistrationCommand } from "./ClientRegistrationIdentity.js";
 import {
   linuxHopperInstallDisclosure,
@@ -229,10 +228,7 @@ const setupPlan = (input: {
           label: "Hopper deep-analysis provider",
           target:
             input.platform === "darwin"
-              ? join(
-                  input.homeDirectory,
-                  "Applications/Hopper Disassembler.app",
-                )
+              ? userMacHopperApplication(input.homeDirectory)
               : "system package manager",
           detail:
             input.platform === "linux"

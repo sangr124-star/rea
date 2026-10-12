@@ -16,6 +16,10 @@ import { promisify } from "node:util";
 import { z } from "zod";
 import { homeDirectoryFromEnvironment } from "../config/homeDirectory.js";
 import {
+  macHopperLauncher,
+  userMacHopperApplication,
+} from "../config/hopperLauncher.js";
+import {
   downloadHopperPackage,
   HOPPER_DOWNLOAD_BYTES,
 } from "./HopperDownload.js";
@@ -136,7 +140,7 @@ export const installMacHopper = async (
         ))
       )
         return { status: "failed", reason: "copy" };
-      const launcherPath = join(destination, "Contents/MacOS/hopper");
+      const launcherPath = macHopperLauncher(destination);
       if (!(await host.launcherReady(launcherPath)))
         return { status: "failed", reason: "launcher_missing" };
       await host.openApplication(destination);
@@ -259,7 +263,7 @@ export const systemMacHopperInstallHost = (
         await rm(stage, { recursive: true, force: true });
         await rm(previous, { recursive: true, force: true });
         await execFileAsync("ditto", [source, stage], { env: environment });
-        await access(join(stage, "Contents/MacOS/hopper"));
+        await access(macHopperLauncher(stage));
         if (replaceExisting) await rename(destination, previous);
         await rename(stage, destination);
         if (replaceExisting)
@@ -307,8 +311,7 @@ export const systemMacHopperInstallHost = (
       }
       return failure;
     },
-    destination: () =>
-      join(homeDirectory, "Applications/Hopper Disassembler.app"),
+    destination: () => userMacHopperApplication(homeDirectory),
   };
 };
 
