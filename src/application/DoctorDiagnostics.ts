@@ -1,17 +1,13 @@
+import { defaultHopperLauncherCandidates } from "../config/hopperLauncher.js";
 import {
   SUPPORTED_NODE_VERSION_PROSE,
   supportsNodeVersion,
 } from "../domain/runtimeVersion.js";
-import { linuxHopperLauncherPath } from "./LinuxHopper.js";
 import type {
   DoctorCheck,
   DoctorHost,
   DoctorProviderInspection,
 } from "./Doctor.js";
-
-const DEFAULT_HOPPER =
-  "/Applications/Hopper Disassembler.app/Contents/MacOS/hopper";
-const SYSTEM_LINUX_HOPPER = "/opt/hopper/bin/Hopper";
 
 /** Ordered environment diagnostics consumed by the Doctor report assembler. */
 export interface DoctorDiagnostics {
@@ -147,9 +143,7 @@ const findHopper = async (host: DoctorHost): Promise<string | undefined> => {
   const candidates =
     host.configuredHopperPath === undefined
       ? [
-          DEFAULT_HOPPER,
-          SYSTEM_LINUX_HOPPER,
-          linuxHopperLauncherPath(host.homeDirectory),
+          ...defaultHopperLauncherCandidates(host.platform, host.homeDirectory),
           ...(await host.manualHopperPaths()),
         ]
       : [host.configuredHopperPath];

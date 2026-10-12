@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import {
+  defaultHopperLauncherPath,
+  macHopperLauncher,
+  userMacHopperApplication,
+} from "./config/hopperLauncher.js";
 import { parseConfig } from "./config/parseConfig.js";
 import { projectAnalysisError } from "./domain/analysisErrorProjection.js";
 
@@ -77,6 +82,44 @@ describe("runtime configuration", () => {
     });
     expect(parseConfig({ REA_ILSPY_CMD_PATH: "relative/ilspycmd" }).ok).toBe(
       false,
+    );
+  });
+});
+
+describe("default Hopper launcher", () => {
+  const home = "/Users/analyst";
+  const systemLauncher =
+    "/Applications/Hopper Disassembler.app/Contents/MacOS/hopper";
+  const setupLauncher = macHopperLauncher(userMacHopperApplication(home));
+
+  it("finds the per-user bundle that rea setup installs on macOS", () => {
+    expect(
+      defaultHopperLauncherPath(
+        "darwin",
+        home,
+        (path) => path === setupLauncher,
+      ),
+    ).toBe(
+      "/Users/analyst/Applications/Hopper Disassembler.app/Contents/MacOS/hopper",
+    );
+  });
+
+  it("prefers the system bundle and reports it when none is executable", () => {
+    expect(defaultHopperLauncherPath("darwin", home, () => true)).toBe(
+      systemLauncher,
+    );
+    expect(defaultHopperLauncherPath("darwin", home, () => false)).toBe(
+      systemLauncher,
+    );
+  });
+
+  it("falls back to the user-local Linux installation", () => {
+    const userLocal = "/Users/analyst/.local/share/rea/hopper/bin/Hopper";
+    expect(
+      defaultHopperLauncherPath("linux", home, (path) => path === userLocal),
+    ).toBe(userLocal);
+    expect(defaultHopperLauncherPath("linux", home, () => false)).toBe(
+      "/opt/hopper/bin/Hopper",
     );
   });
 });

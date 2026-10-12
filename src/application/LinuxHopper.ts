@@ -226,10 +226,6 @@ export const installLinuxHopper = async (
   }
 };
 
-/** Canonical launcher path for a legacy user-local Linux Hopper installation. */
-export const linuxHopperLauncherPath = (home: string): string =>
-  join(home, ".local/share/rea/hopper/bin/Hopper");
-
 /** Compose package-manager and linker checks from the selected caller environment. */
 export const systemLinuxHopperInstallHost = (
   environment: Readonly<NodeJS.ProcessEnv>,
